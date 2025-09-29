@@ -1,0 +1,218 @@
+openapi: 3.0.3
+info:
+  title: National Insurance
+  description: |
+    # Data availability
+
+    Data is available for taxpayers who, in the given tax year, have:
+
+    - self-employment income
+    - self-employment and employment income
+
+    Class 1 NICable earnings data is not available until Class 1 NICs reconciliation is complete. This starts in May and is usually complete by the end of August. Before reconciliation, Class 1 NICable earnings is returned as £0.00.
+
+    Class 2 NI contributions data should be available immediately at the end of the relevant tax year. However it can change after that date due to Class 1 NICs reconciliation or if we receive late changes from the taxpayer.
+
+    Find out more about [National Insurance](https://www.gov.uk/national-insurance/overview).
+
+    # Authorisation
+
+    The endpoint in this API is [user-restricted](https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/user-restricted-endpoints).
+    Your users must grant authority for your software to access it by signing in to their HMRC online account.
+
+    The API supports individual and agent users. Note that:
+    - Individual users can only access their own information.
+    - Agent users can only access their own clients’ data.
+
+    The following options are supported for agents:
+
+    **Option 1: Agent services account**
+
+    If the agent uses an [agent services account](https://www.gov.uk/government/collections/hmrc-online-services-for-agents#agent-services-account),
+    they can access their [existing 64-8 clients](https://www.gov.uk/guidance/client-authorisation-an-overview)
+    who they have [linked to their agent services account](https://www.gov.uk/guidance/link-clients-to-your-agent-services-account#link-existing-clients)
+    (restricted to 2 years’ history)
+
+    **Option 2: HMRC online services for agents account**
+
+    If the agent uses an [HMRC online services for agents account](https://www.gov.uk/government/collections/hmrc-online-services-for-agents#hmrc-online-services-for-agents-account)
+    which is enrolled for [Self Assessment for Agents](https://www.gov.uk/guidance/self-assessment-for-agents-online-service),
+    they will be able to access their [existing 64-8 clients](https://www.gov.uk/guidance/client-authorisation-an-overview)
+    (restricted to 2 years’ history).
+  version: '1.1'
+servers:
+  - url: https://test-api.service.hmrc.gov.uk
+    description: Sandbox
+  - url: https://api.service.hmrc.gov.uk
+    description: Production
+paths:
+  /national-insurance/sa/{utr}/annual-summary/{taxYear}:
+    get:
+      tags:
+        - national-insurance
+      summary: Get National Insurance annual summary
+      description: Fetches an individual’s National Insurance contributions for the given tax year.
+      operationId: getNationalInsuranceAnnualSummary
+      parameters:
+        - $ref: '#/components/parameters/utr'
+        - $ref: '#/components/parameters/taxYear'
+        - $ref: '#/components/parameters/acceptHeader'
+        - $ref: '#/components/parameters/authorizationHeader'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/nationalInsuranceSaAnnualSummaryResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorResponse'
+              examples:
+                invalidUtr:
+                  description: Invalid UTR
+                  value:
+                    code: SA_UTR_INVALID
+                    message: The provided SA UTR is invalid
+                invalidTaxYear:
+                  description: Invalid tax year
+                  value:
+                    code: TAX_YEAR_INVALID
+                    message: The provided Tax Year is invalid
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorResponse'
+              examples:
+                userNotAuthorised:
+                  description: User not authorised to access data for given UTR
+                  value:
+                    code: UNAUTHORIZED
+                    message: Bearer token is missing or not authorized
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorResponse'
+              examples:
+                dataNotAvailable:
+                  description: Data not available for given UTR and tax year (see the data availability section for more details)
+                  value:
+                    code: NOT_FOUND
+                    message: Resource was not found
+      deprecated: false
+      security:
+        - user-restricted:
+            - read:national-insurance
+components:
+  parameters:
+    utr:
+      name: utr
+      in: path
+      description: The 10 digit self-assessment UTR for the individual.
+      required: true
+      style: simple
+      schema:
+        type: string
+        example: 2234567890
+    taxYear:
+      name: taxYear
+      in: path
+      description: The tax year for the National Insurance Contribution being retrieved.
+      required: true
+      style: simple
+      schema:
+        pattern: ^[0-9]{4}-[0-9]{2}$
+        type: string
+        example: 2014-15
+    acceptHeader:
+      name: Accept
+      in: header
+      description: Specifies the response format and the [version](/api-documentation/docs/reference-guide#versioning) of the API to be used.
+      style: simple
+      schema:
+        type: string
+        enum:
+          - application/vnd.hmrc.1.1+json
+      required: true
+    authorizationHeader:
+      name: Authorization
+      in: header
+      description: An [OAuth 2.0 Bearer Token](/api-documentation/docs/authorisation/user-restricted-endpoints) with the `read:national-insurance` scope.
+      style: simple
+      schema:
+        type: string
+        example: Bearer bb7fed3fe10dd235a2ccda3d50fb
+      required: true
+  securitySchemes:
+    user-restricted:
+      type: oauth2
+      description: HMRC supports OAuth 2.0 for authenticating [user-restricted](https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/user-restricted-endpoints) API requests using an OAuth 2.0 Bearer Token in the Authorization header.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.service.hmrc.gov.uk/oauth/authorize
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
+          scopes:
+            read:national-insurance: Access National Insurance contribution information
+  schemas:
+    errorResponse:
+      title: errorResponse
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: string
+          description: The error code
+        message:
+          type: string
+          description: The error message
+    class1:
+      title: class1
+      required:
+        - totalNICableEarnings
+      type: object
+      properties:
+        totalNICableEarnings:
+          type: number
+          description: Total Class 1 earnings subject to National Insurance contributions between the Primary Threshold and the Upper Earnings Limit
+          example: 10
+    class2:
+      title: class2
+      required:
+        - totalDue
+      type: object
+      properties:
+        totalDue:
+          type: number
+          description: Total Class 2 National Insurance contributions due
+          example: 20
+    nationalInsuranceSaAnnualSummaryResponse:
+      title: nationalInsuranceSaAnnualSummaryResponse
+      required:
+        - class1
+        - class2
+        - maxNICsReached
+      type: object
+      properties:
+        class1:
+          $ref: '#/components/schemas/class1'
+        class2:
+          $ref: '#/components/schemas/class2'
+        maxNICsReached:
+          type: boolean
+          description: A flag indicating whether the maximum National Insurance contributions has been reached
+          example: false
+      description: National Insurance annual summary
