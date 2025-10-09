@@ -112,7 +112,7 @@ paths:
                     message: Resource was not found
       deprecated: false
       security:
-        - user-restricted:
+        - User-Restricted:
             - read:national-insurance
 components:
   parameters:
@@ -155,7 +155,7 @@ components:
         example: Bearer bb7fed3fe10dd235a2ccda3d50fb
       required: true
   securitySchemes:
-    user-restricted:
+    User-Restricted:
       type: oauth2
       description: HMRC supports OAuth 2.0 for authenticating [user-restricted](https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/user-restricted-endpoints) API requests using an OAuth 2.0 Bearer Token in the Authorization header.
       flows:
