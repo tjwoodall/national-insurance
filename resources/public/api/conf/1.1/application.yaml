@@ -28,17 +28,11 @@ info:
 
     **Option 1: Agent services account**
 
-    If the agent uses an [agent services account](https://www.gov.uk/government/collections/hmrc-online-services-for-agents#agent-services-account),
-    they can access their [existing 64-8 clients](https://www.gov.uk/guidance/client-authorisation-an-overview)
-    who they have [linked to their agent services account](https://www.gov.uk/guidance/link-clients-to-your-agent-services-account#link-existing-clients)
-    (restricted to 2 years’ history)
+    If the agent uses an [agent services account](https://www.gov.uk/government/collections/hmrc-online-services-for-agents#agent-services-account), they can access their [existing 64-8 clients](https://www.gov.uk/guidance/how-to-get-authorised-to-act-as-a-tax-agent-on-behalf-of-your-clients#get-authorised-using-online-services-online-forms-or-paper-forms) who they have linked to their agent services account (restricted to 2 years’ history).
 
     **Option 2: HMRC online services for agents account**
 
-    If the agent uses an [HMRC online services for agents account](https://www.gov.uk/government/collections/hmrc-online-services-for-agents#hmrc-online-services-for-agents-account)
-    which is enrolled for [Self Assessment for Agents](https://www.gov.uk/guidance/self-assessment-for-agents-online-service),
-    they will be able to access their [existing 64-8 clients](https://www.gov.uk/guidance/client-authorisation-an-overview)
-    (restricted to 2 years’ history).
+    If the agent uses an [HMRC online services for agents account](https://www.gov.uk/government/collections/hmrc-online-services-for-agents#hmrc-online-services-for-agents-account) which is enrolled for [Self Assessment for Agents](https://www.gov.uk/guidance/self-assessment-for-agents-online-service), they will be able to access their [existing 64-8 clients](https://www.gov.uk/guidance/how-to-get-authorised-to-act-as-a-tax-agent-on-behalf-of-your-clients#get-authorised-using-online-services-online-forms-or-paper-forms) (restricted to 2 years’ history).
   version: '1.1'
 servers:
   - url: https://test-api.service.hmrc.gov.uk
